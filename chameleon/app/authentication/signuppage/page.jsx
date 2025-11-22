@@ -29,6 +29,7 @@ import {
   FieldSet,
 } from "@/components/ui/field";
 
+
 export default function SignUpPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
