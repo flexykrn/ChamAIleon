@@ -34,8 +34,9 @@ class InspectionResponse(BaseModel):
     message: str
     client_ip: str
     timestamp: str
-    endpoint: str               # NEW
+    endpoint: str              # NEW
     http_method: str           # NEW
+    payload: str               # NEW (incoming request payload)
     analysis: AnalysisDetails
 
 ml_defense: ChameleonDefense = None
@@ -84,8 +85,9 @@ def analyze_packet(request: InspectionRequest, response: Response, req: Request)
         message=result.get("msg", "Processed"),
         client_ip=client_ip,
         timestamp=datetime.utcnow().isoformat(),
-        endpoint=req.url.path,        # NEW
-        http_method=req.method,       # NEW
+        endpoint=req.url.path,       # NEW
+        http_method=req.method,      # NEW
+        payload=request.payload,     # NEW
         analysis=AnalysisDetails(
             verdict=result.get("classification", "Unknown"),
             confidence=result.get("confidence", 0.0),
