@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from typing import Optional, List
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Response, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,6 +11,15 @@ import uvicorn
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("chameleon_api")
 
+class XAIContributor(BaseModel):
+    feature: str
+    impact: float
+    type: str
+
+class XAIExplanation(BaseModel):
+    target_class: str
+    contributors: List[XAIContributor]
+
 class InspectionRequest(BaseModel):
     payload: str = Field(..., min_length=1)
 
@@ -17,12 +27,14 @@ class AnalysisDetails(BaseModel):
     verdict: str
     confidence: float
     detected_by: str
+    xai_explanation: Optional[XAIExplanation] = None
 
 class InspectionResponse(BaseModel):
     status: int
     message: str
+    client_ip: str
     timestamp: str
-    analysis: AnalysisDetails  
+    analysis: AnalysisDetails
 
 ml_defense: ChameleonDefense = None
 
@@ -59,22 +71,22 @@ def analyze_packet(request: InspectionRequest, response: Response, req: Request)
     if not ml_defense:
         raise HTTPException(status_code=503, detail="Defense engine not ready")
 
-    client_ip = req.client.host
+    client_ip = req.client.host if req.client else "IP not fetched"
 
     result = ml_defense.analyze_request(request.payload, client_ip)
 
-   
     response.status_code = result.get("status", 200)
 
- 
     return InspectionResponse(
         status=result.get("status", 200),
         message=result.get("msg", "Processed"),
+        client_ip=client_ip,
         timestamp=datetime.utcnow().isoformat(),
         analysis=AnalysisDetails(
             verdict=result.get("classification", "Unknown"),
             confidence=result.get("confidence", 0.0),
-            detected_by=result.get("detection_source", "System")
+            detected_by=result.get("detection_source", "System"),
+            xai_explanation=result.get("xai_explanation")
         )
     )
 
