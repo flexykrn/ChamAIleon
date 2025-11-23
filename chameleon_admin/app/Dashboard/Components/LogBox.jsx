@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye, Download, ChevronsUpDown } from "lucide-react";
+import { Eye, Download, ChevronsUpDown, Activity, Shield, AlertTriangle, Globe } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -223,61 +223,145 @@ export default function SecurityLogsTable({ logs = [] }) {
 
       {/* DETAILS MODAL (single log) */}
       <Dialog open={!!selectedLog} onOpenChange={() => setSelectedLog(null)}>
-        <DialogContent className="max-w-3xl">
-          <DialogHeader>
-            <DialogTitle>Log Details</DialogTitle>
-            <DialogDescription>
-              Full details of the attack event.
+        <DialogContent className="max-w-[95vw] w-[1400px] max-h-[95vh] overflow-y-auto">
+          <DialogHeader className="pb-6 border-b">
+            <DialogTitle className="text-2xl font-bold flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <Eye className="h-5 w-5 text-primary" />
+              </div>
+              Security Event Details
+            </DialogTitle>
+            <DialogDescription className="text-base mt-2">
+              Comprehensive analysis and forensic information for this attack event
             </DialogDescription>
           </DialogHeader>
 
           {selectedLog && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">Time</p>
-                  <p className="font-mono">{selectedLog.time}</p>
-                </div>
+            <div className="space-y-6 py-4">
+              {/* Overview Section */}
+              <div className="bg-gradient-to-r from-primary/5 to-transparent p-6 rounded-lg border border-primary/20">
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <Activity className="h-5 w-5" />
+                  Event Overview
+                </h3>
+                <div className="grid grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Timestamp</p>
+                    <p className="text-base font-mono font-semibold">{selectedLog.time}</p>
+                  </div>
 
-                <div>
-                  <p className="text-sm text-muted-foreground">IP Address</p>
-                  <p className="font-mono">{selectedLog.ip}</p>
-                </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">IP Address</p>
+                    <p className="text-base font-mono font-semibold text-primary">{selectedLog.ip}</p>
+                  </div>
 
-                <div>
-                  <p className="text-sm text-muted-foreground">Location</p>
-                  <p>
-                    {selectedLog.city}, {selectedLog.country}
-                  </p>
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Location</p>
+                    <p className="text-base font-semibold flex items-center gap-2">
+                      <Globe className="h-4 w-4 text-muted-foreground" />
+                      {selectedLog.city}, {selectedLog.country}
+                    </p>
+                  </div>
                 </div>
+              </div>
 
-                <div>
-                  <p className="text-sm text-muted-foreground">
+              {/* Classification & Request Details */}
+              <div className="grid grid-cols-2 gap-6">
+                <div className="bg-card border rounded-lg p-6 space-y-4">
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <Shield className="h-5 w-5" />
                     Classification
-                  </p>
-                  <Badge
-                    variant="outline"
-                    className={getClassificationColor(
-                      selectedLog.classification
-                    )}
-                  >
-                    {selectedLog.classification.toUpperCase()}
-                  </Badge>
+                  </h3>
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-2">Threat Type</p>
+                      <Badge
+                        variant="outline"
+                        className={`${getClassificationColor(selectedLog.classification)} text-base px-4 py-2 font-semibold`}
+                      >
+                        {selectedLog.classification.toUpperCase()}
+                      </Badge>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-2">Session ID</p>
+                      <p className="font-mono text-sm bg-secondary/50 p-3 rounded border">
+                        {selectedLog.sessionId}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-card border rounded-lg p-6 space-y-4">
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <Activity className="h-5 w-5" />
+                    Request Details
+                  </h3>
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-2">HTTP Method</p>
+                      <Badge className="font-mono font-bold text-sm px-3 py-1">
+                        {selectedLog.httpMethod || 'N/A'}
+                      </Badge>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-2">Endpoint</p>
+                      <p className="font-mono text-sm bg-secondary/50 p-3 rounded border break-all">
+                        {selectedLog.endpoint || 'N/A'}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div>
-                <p className="text-sm text-muted-foreground">Session ID</p>
-                <p className="font-mono text-xs bg-secondary p-2 rounded">
-                  {selectedLog.sessionId}
-                </p>
+              {/* Payload Section */}
+              <div className="bg-card border rounded-lg p-6">
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-orange-500" />
+                  Malicious Payload
+                </h3>
+                <div className="bg-destructive/5 border border-destructive/20 p-4 rounded-lg">
+                  <pre className="font-mono text-sm whitespace-pre-wrap break-all max-h-48 overflow-y-auto text-destructive">
+                    {selectedLog.input}
+                  </pre>
+                </div>
               </div>
 
-              <div>
-                <p className="text-sm text-muted-foreground">Payload</p>
-                <p className="font-mono text-xs bg-secondary p-2 rounded max-h-40 overflow-y-auto">
-                  {selectedLog.input}
-                </p>
+              {/* AI Analysis Section */}
+              <div className="bg-gradient-to-r from-blue-500/5 to-purple-500/5 border border-blue-500/20 rounded-lg p-6">
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                    <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
+                  </svg>
+                  AI-Powered Attack Analysis (Gemini)
+                </h3>
+                <div className="bg-white/50 dark:bg-black/20 p-5 rounded-lg border border-blue-500/20">
+                  <p className="text-base leading-relaxed whitespace-pre-wrap">
+                    {selectedLog.attackIntent || 'No analysis available'}
+                  </p>
+                </div>
+              </div>
+
+              {/* XAI Explanation Section */}
+              <div className="bg-gradient-to-r from-purple-500/5 to-pink-500/5 border border-purple-500/20 rounded-lg p-6">
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 16v-4M12 8h.01"/>
+                  </svg>
+                  Explainable AI (XAI) Model Insights
+                </h3>
+                <div className="bg-white/50 dark:bg-black/20 p-5 rounded-lg border border-purple-500/20 max-h-80 overflow-y-auto">
+                  <pre className="text-sm whitespace-pre-wrap font-mono leading-relaxed">
+                    {selectedLog.xaiExplanation ? 
+                      (typeof selectedLog.xaiExplanation === 'object' ? 
+                        JSON.stringify(selectedLog.xaiExplanation, null, 2) : 
+                        selectedLog.xaiExplanation
+                      ) : 
+                      'No XAI explanation available'
+                    }
+                  </pre>
+                </div>
               </div>
             </div>
           )}

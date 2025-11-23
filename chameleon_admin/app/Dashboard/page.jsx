@@ -10,6 +10,7 @@ import Logo from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner"; // if you have a spinner component; otherwise fallback
 import { toast } from "sonner"; // ensure Toaster is in layout
+import { generateDashboardPDF } from "@/lib/pdfExport"; // PDF export utility
 import KPICard from "./Components/kpiCards";
 import {
   Shield,
@@ -166,17 +167,29 @@ export default function Dashboard() {
     }
   };
 
-  // Save Reports placeholder
+  // Save Reports - Generate PDF
   const handleSaveReports = async () => {
     setReportLoading(true);
+    
+    // Show loading toast
+    const loadingToast = toast.loading("Generating PDF report... (Console warnings are normal)", { duration: 10000 });
+    
     try {
-      // TODO: replace with actual report generation API call
-      // await fetch("/api/admin/generate-report", { method: "POST", body: ... })
-      await new Promise((r) => setTimeout(r, 1200));
-      toast.success("Report saved to Reports folder (demo)");
+      // Small delay to ensure all components are fully rendered
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // Generate comprehensive PDF with current dashboard state
+      const result = await generateDashboardPDF(stats, attacks);
+      
+      toast.dismiss(loadingToast);
+      
+      if (result.success) {
+        toast.success(`✅ Dashboard report saved: ${result.fileName}`, { duration: 5000 });
+      }
     } catch (err) {
-      console.error("Report error:", err);
-      toast.error("Failed to save report");
+      toast.dismiss(loadingToast);
+      console.error("Report generation error:", err);
+      toast.error(`❌ Failed to generate report: ${err.message}`, { duration: 5000 });
     } finally {
       setReportLoading(false);
     }
@@ -311,7 +324,7 @@ export default function Dashboard() {
       <main className="mt-8">
         {/* Insert dashboard content here */}
         <div className="max-w-7xl  mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div id="kpi-cards-section" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <KPICard
               title="Total Threats"
               value={stats.total}
@@ -333,13 +346,12 @@ export default function Dashboard() {
               icon={ShieldAlert}
             />
           </div>
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div id="charts-row" className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <ChartRadarAttack
               dataCounts={{ 
                 benign: stats.benign, 
                 xss: stats.xss, 
-                sqli: stats.sqli, 
-                bruteforce: stats.bruteforce 
+                sqli: stats.sqli
               }}
               title="Attack Distribution"
             />
@@ -352,25 +364,27 @@ export default function Dashboard() {
               }))}
               title="Attacks (Last 12 Hours)"
             />
-            <MapZone
-              zones={attacks
-                .filter(a => a.latitude && a.longitude && a.latitude !== 0 && a.longitude !== 0)
-                .slice(0, 50)
-                .map((attack, idx) => ({
-                  id: attack.id || idx,
-                  lat: attack.latitude,
-                  lng: attack.longitude,
-                  radius: 500,
-                  color: attack.classification === 'sqli' ? 'rgba(239,68,68,0.7)' : 
-                         attack.classification === 'xss' ? 'rgba(251,146,60,0.7)' : 
-                         'rgba(240,196,25,0.7)',
-                  popup: `${attack.city || 'Unknown'}, ${attack.country || 'Unknown'}`
-                }))
-              }
-              mapHeight="480px"
-            />
+            <div id="map-section">
+              <MapZone
+                zones={attacks
+                  .filter(a => a.latitude && a.longitude && a.latitude !== 0 && a.longitude !== 0)
+                  .slice(0, 50)
+                  .map((attack, idx) => ({
+                    id: attack.id || idx,
+                    lat: attack.latitude,
+                    lng: attack.longitude,
+                    radius: 500,
+                    color: attack.classification === 'sqli' ? 'rgba(239,68,68,0.7)' : 
+                           attack.classification === 'xss' ? 'rgba(251,146,60,0.7)' : 
+                           'rgba(240,196,25,0.7)',
+                    popup: `${attack.city || 'Unknown'}, ${attack.country || 'Unknown'}`
+                  }))
+                }
+                mapHeight="480px"
+              />
+            </div>
           </div>
-          <div className="mt-8">
+          <div id="logs-section" className="mt-8">
             <SecurityLogsTable logs={attacks.slice(0, 100).map(attack => ({
               id: attack.id,
               sessionId: attack.id.substring(0, 16),
@@ -383,7 +397,11 @@ export default function Dashboard() {
               ip: attack.ip || attack.clientIp || 'Unknown',
               city: attack.city || 'Unknown',
               country: attack.country || 'Unknown',
-              classification: (attack.classification || 'benign').toLowerCase()
+              classification: (attack.classification || 'benign').toLowerCase(),
+              httpMethod: attack.httpMethod || 'N/A',
+              endpoint: attack.endpoint || 'N/A',
+              attackIntent: attack.attackIntention || attack.geminiAnalysis || 'No analysis available',
+              xaiExplanation: attack.xaiExplanation || 'No XAI explanation available'
             }))} />
           </div>
          
