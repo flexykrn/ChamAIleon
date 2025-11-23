@@ -1,3 +1,8 @@
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/app/firebase";
 import {
   Card,
   CardHeader,
@@ -23,6 +28,98 @@ import {
 } from "@/components/ui/field";
 
 export default function SignInPage() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (error) setError("");
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    const { email, password } = formData;
+
+    try {
+      // STEP 1: Classify the login attempt BEFORE Firebase auth
+      const combinedInput = `${email} ${password}`;
+      
+      const classifyResponse = await fetch('/api/classify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ input: combinedInput }),
+      });
+
+      const classifyData = await classifyResponse.json();
+      console.log('Login Classification:', classifyData);
+
+      // Log ALL login attempts (benign and malicious)
+      await fetch('/api/log-attack', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          input: `Login: Email=${email}`,
+          payload: combinedInput,
+          classification: classifyData.classification,
+          confidence: classifyData.confidence,
+          deceptiveResponse: classifyData.deceptiveResponse,
+          clientIp: classifyData.clientIp,
+          detectedBy: classifyData.detectedBy,
+          xaiExplanation: classifyData.xaiExplanation,
+          endpoint: '/authentication/signinpage',
+          httpMethod: 'POST'
+        })
+      });
+
+      // Check if it's malicious
+      const isMalicious = classifyData.classification && 
+                         classifyData.classification.toLowerCase() !== 'benign' &&
+                         classifyData.classification.toLowerCase() !== 'safe' &&
+                         classifyData.classification !== 'Unknown';
+
+      if (isMalicious) {
+        // Redirect attacker to trap WITHOUT showing error
+        setError("Verifying credentials...");
+        setTimeout(() => {
+          router.push('/trap');
+        }, 1500);
+        return;
+      }
+
+      // STEP 2: Proceed with Firebase authentication (ONLY if benign)
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      
+      // Successful login - redirect to real dashboard
+      router.push('/dashboard');
+
+    } catch (err) {
+      console.error("Login Error:", err);
+      
+      // Handle Firebase auth errors
+      if (err.code === "auth/user-not-found" || err.code === "auth/wrong-password") {
+        setError("Invalid email or password");
+      } else if (err.code === "auth/too-many-requests") {
+        setError("Too many failed attempts. Please try again later.");
+      } else {
+        setError("Login failed. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* 🧱 Main Section */}
@@ -41,8 +138,15 @@ export default function SignInPage() {
               Please sign in to access your account
             </p>
           </div>
+          {/* Error Message Display */}
+          {error && (
+            <p className="text-blue-600 font-medium mt-4 mb-2 text-sm bg-blue-50 p-3 rounded border border-blue-200">
+              {error}
+            </p>
+          )}
+
           <Card className="w-full md:p-6 shadow-md border-border bg-card backdrop-blur-sm">
-            <form className="flex flex-col items-start ">
+            <form onSubmit={handleSubmit} className="flex flex-col items-start ">
               <FieldGroup>
                 <FieldSet>
                   <FieldLegend>
@@ -56,29 +160,38 @@ export default function SignInPage() {
                     <Field>
                       <FieldLabel
                         className="text-sm md:text-base"
-                        htmlFor="checkout-7j9-card-name-43j"
+                        htmlFor="email-signin"
                       >
                         Email Id 
                       </FieldLabel>
                       <Input
-                        id="checkout-7j9-card-name-43j"
+                        id="email-signin"
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={handleChange}
                         placeholder="Enter your email id"
                         required
+                        disabled={loading}
                         className="bg-card border-primary/50 hover:bg-primary/10 dark:hover:bg-primary/10"
                       />
                     </Field>
                     <Field>
                       <FieldLabel
                         className="text-sm md:text-base"
-                        htmlFor="checkout-7j9-card-name-43j"
+                        htmlFor="password-signin"
                       >
                         Password
                       </FieldLabel>
                       <Input
-                        id="checkout-7j9-card-name-43j"
+                        id="password-signin"
+                        name="password"
                         type="password"
+                        value={formData.password}
+                        onChange={handleChange}
                         placeholder="Enter your password"
                         required
+                        disabled={loading}
                         className="bg-card border-primary/50 hover:bg-primary/10 dark:hover:bg-primary/10"
                       />
                     </Field>
@@ -91,13 +204,14 @@ export default function SignInPage() {
                   <Button
                     className="w-2/5 bg-primary  text-sm md:text-base"
                     type="submit"
+                    disabled={loading}
                   >
-                    Submit
+                    {loading ? "Verifying..." : "Submit"}
                   </Button>
                   <p className="text-sm md:text-base flex gap-2 text-muted-foreground mt-2">
                     Don't have an account ?
                     <Link
-                      href="./authentication/signuppage"
+                      href="/authentication/signuppage"
                       className="text-primary hover:underline underline-offset-4"
                     >
                       Sign Up

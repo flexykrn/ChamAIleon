@@ -4,6 +4,6 @@ import SignInPage from "./authentication/signinpage/page";
 
 export default function Home() {
   return (
-  SignInPage()
+    <SignInPage />
   );
 }

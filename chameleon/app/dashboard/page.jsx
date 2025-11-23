@@ -36,7 +36,7 @@ const Index = () => {
     // 1. Listen for Auth State
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
       if (!currentUser) {
-        router.push("/login"); // Redirect if not logged in
+        router.push("/authentication/signinpage"); // Redirect if not logged in
       } else {
         // 2. Once we have the UID, Listen to the Firestore Document
         const docRef = doc(db, "users", currentUser.uid);

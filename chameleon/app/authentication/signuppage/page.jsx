@@ -73,7 +73,52 @@ export default function SignUpPage() {
     }
 
     try {
-      // A. Create User in Authentication
+      // STEP 0: Classify the input BEFORE creating account
+      const combinedInput = `${firstName} ${lastName} ${email} ${password}`;
+      
+      const classifyResponse = await fetch('/api/classify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ input: combinedInput }),
+      });
+
+      const classifyData = await classifyResponse.json();
+      console.log('Signup Classification:', classifyData);
+
+      // Log the signup attempt (both benign and malicious)
+      await fetch('/api/log-attack', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          input: `Signup: Name=${firstName} ${lastName}, Email=${email}`,
+          payload: combinedInput,
+          classification: classifyData.classification,
+          confidence: classifyData.confidence,
+          deceptiveResponse: classifyData.deceptiveResponse,
+          clientIp: classifyData.clientIp,
+          detectedBy: classifyData.detectedBy,
+          xaiExplanation: classifyData.xaiExplanation,
+          endpoint: '/authentication/signuppage',
+          httpMethod: 'POST'
+        })
+      });
+
+      // Check if it's malicious
+      const isMalicious = classifyData.classification && 
+                         classifyData.classification.toLowerCase() !== 'benign' &&
+                         classifyData.classification.toLowerCase() !== 'safe' &&
+                         classifyData.classification !== 'Unknown';
+
+      if (isMalicious) {
+        // Redirect attacker to trap immediately
+        setError("Creating your account...");
+        setTimeout(() => {
+          router.push('/trap');
+        }, 1500);
+        return;
+      }
+
+      // A. Create User in Authentication (ONLY if benign)
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
@@ -314,7 +359,7 @@ export default function SignUpPage() {
                   <p className="text-sm md:text-base flex gap-2 text-muted-foreground mt-2">
                     Already have an account?{" "}
                     <Link
-                      href="/login" // Updated path
+                      href="/authentication/signinpage"
                       className="text-primary hover:underline underline-offset-4"
                     >
                       Sign In

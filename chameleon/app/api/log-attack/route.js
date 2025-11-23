@@ -1,0 +1,136 @@
+import { NextResponse } from 'next/server';
+import { db } from '@/app/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { headers } from 'next/headers';
+
+export async function POST(request) {
+  console.log('🔥 LOG-ATTACK API CALLED');
+  try {
+    const body = await request.json();
+    console.log('📦 Received body:', JSON.stringify(body, null, 2));
+    
+    const { 
+      input, 
+      classification, 
+      confidence, 
+      deceptiveResponse,
+      clientIp,
+      detectedBy,
+      xaiExplanation,
+      endpoint,
+      httpMethod,
+      payload
+    } = body;
+    
+    const headersList = await headers();
+    
+    // Get IP address from headers or use clientIp from response
+    const ip = clientIp || 
+               headersList.get('x-forwarded-for')?.split(',')[0] || 
+               headersList.get('x-real-ip') || 
+               'unknown';
+
+    // Get GeoIP data
+    let geoData = { 
+      country_name: 'Unknown', 
+      city: 'Unknown', 
+      latitude: 0, 
+      longitude: 0,
+      region: 'Unknown',
+      timezone: 'Unknown'
+    };
+    
+    if (ip !== 'unknown' && ip !== '127.0.0.1' && ip !== '::1') {
+      try {
+        const geoResponse = await fetch(`https://ipapi.co/${ip}/json/`, {
+          headers: {
+            'User-Agent': 'Chameleon-Security-System/1.0'
+          }
+        });
+        
+        if (geoResponse.ok) {
+          const geoJson = await geoResponse.json();
+          if (!geoJson.error) {
+            geoData = {
+              country_name: geoJson.country_name || 'Unknown',
+              city: geoJson.city || 'Unknown',
+              latitude: geoJson.latitude || 0,
+              longitude: geoJson.longitude || 0,
+              region: geoJson.region || 'Unknown',
+              timezone: geoJson.timezone || 'Unknown'
+            };
+          }
+        }
+      } catch (error) {
+        console.error('GeoIP lookup failed:', error);
+        // Continue with default values
+      }
+    }
+
+    // Create attack log document with new schema
+    const attackLog = {
+      // Basic info
+      input: input || payload,
+      payload: payload || input,
+      classification: classification,
+      verdict: classification, // alias for new schema
+      confidence: parseFloat(confidence) || 0,
+      deceptiveResponse: deceptiveResponse,
+      message: deceptiveResponse, // alias for new schema
+      
+      // Detection info
+      detectedBy: detectedBy || 'Chameleon Model',
+      
+      // XAI Explanation (if available)
+      xaiExplanation: xaiExplanation || null,
+      
+      // Network info
+      ip: ip,
+      clientIp: ip, // alias for new schema
+      country: geoData.country_name,
+      city: geoData.city,
+      region: geoData.region,
+      latitude: geoData.latitude,
+      longitude: geoData.longitude,
+      timezone: geoData.timezone,
+      
+      // Request info
+      endpoint: endpoint || '/trap',
+      httpMethod: httpMethod || 'POST',
+      userAgent: headersList.get('user-agent') || 'Unknown',
+      referer: headersList.get('referer') || 'Direct',
+      
+      // Timestamp
+      timestamp: serverTimestamp(),
+      timestampISO: new Date().toISOString()
+    };
+
+    // Save to Firestore
+    console.log('💾 Attempting to save to Firestore...');
+    console.log('📄 Attack log data:', JSON.stringify(attackLog, null, 2));
+    
+    const docRef = await addDoc(collection(db, 'attacks'), attackLog);
+    
+    console.log('✅ Successfully saved to Firestore! Doc ID:', docRef.id);
+
+    return NextResponse.json({ 
+      success: true, 
+      attackId: docRef.id,
+      message: 'Attack logged successfully' 
+    });
+
+  } catch (error) {
+    console.error('❌ Logging error:', error);
+    console.error('Error stack:', error.stack);
+    return NextResponse.json(
+      { 
+        error: 'Logging failed', 
+        details: error.message,
+        stack: error.stack 
+      },
+      { status: 500 }
+    );
+  }
+}
+
+export const runtime = 'nodejs';
