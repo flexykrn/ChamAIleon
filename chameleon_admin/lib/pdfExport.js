@@ -710,10 +710,11 @@ export async function generateDashboardPDF(stats, attacks) {
     pdf.text('Log Authenticity & Tamper Detection', 20, currentY + 7);
     currentY += 18;
 
+    const contractAddress = process.env.NEXT_PUBLIC_LOG_ANCHOR_CONTRACT || 'Not configured';
     const blockchainInfo = [
       { label: 'Status:', value: 'Blockchain Integration Active', color: [34, 197, 94] },
       { label: 'Network:', value: 'Hoodi Testnet (Chain ID: 560048)', highlight: true },
-      { label: 'Contract:', value: '0xecEFBA4B95fcD63C88f05Bd653c3eD5B2c574008'.substring(0, 20) + '...' },
+      { label: 'Contract:', value: contractAddress.length > 20 ? contractAddress.substring(0, 20) + '...' : contractAddress },
       { label: 'Last Anchor:', value: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }) }
     ];
 

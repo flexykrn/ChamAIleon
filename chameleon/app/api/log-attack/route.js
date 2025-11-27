@@ -8,8 +8,13 @@ import { headers } from 'next/headers';
  * Returns a concise explanation of the attack intention
  */
 async function analyzePayloadWithGemini(payload, classification) {
-  const GEMINI_API_KEY = 'AIzaSyDSx4YJyLuDs9zyAAu8lX5nYdVm52LwPkk';
+  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
   const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`;
+  
+  if (!GEMINI_API_KEY) {
+    console.warn('⚠️ GEMINI_API_KEY not configured, skipping AI analysis');
+    return null;
+  }
   
   try {
     const prompt = `Analyze this ${classification} attack payload and provide ONE concise sentence (max 120 chars) explaining what the attacker was trying to do. Include a security reference link.
