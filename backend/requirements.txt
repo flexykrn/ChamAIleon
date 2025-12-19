@@ -1,6 +1,7 @@
 fastapi
-uvicorn
+uvicorn[standard]
 pydantic
 numpy
-scikit-learn==1.7.2
-shap 
+scikit-learn==1.5.2
+shap
+pandas 

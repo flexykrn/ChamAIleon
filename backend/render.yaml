@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: chameleon-backend
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python classify_api.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
