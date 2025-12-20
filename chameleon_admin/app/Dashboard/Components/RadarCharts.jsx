@@ -23,7 +23,7 @@ export default function ChartRadarAttack({
   title = "Attack Distribution",
 }) {
   // Fallback sample if nothing provided
-  const sample = { benign: 120, xss: 50, sqli: 42 };
+  const sample = { benign: 120, xss: 50, sqli: 42, bruteforce: 15 };
   const counts = dataCounts || sample;
 
   // MUST EXIST — Radar data with dataset keys
@@ -31,6 +31,7 @@ export default function ChartRadarAttack({
     { category: "Benign", value: counts.benign ?? 0 },
     { category: "XSS", value: counts.xss ?? 0 },
     { category: "SQLi", value: counts.sqli ?? 0 },
+    { category: "Brute Force", value: counts.bruteforce ?? 0 },
   ];
 
   const chartConfig = {

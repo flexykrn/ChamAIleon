@@ -40,7 +40,8 @@ class HeuristicReflex:
 class ChameleonDefense:
     def __init__(self, model_path='chameleon_brain.pkl'):
         self.reflex = HeuristicReflex()
-        self.ip_tracker = {} 
+        self.ip_tracker = {}  # For tarpit delay tracking (60 second window)
+        self.brute_force_tracker = {}  # For brute force detection (1 second window)
         self.evidence_chain = []
         self.previous_hash = "0" * 64
         self.model = None
@@ -77,13 +78,49 @@ class ChameleonDefense:
             return min((count - 5) * 1.5, 10)
         return 0
 
+    def detect_brute_force(self, ip):
+        """
+        Detect brute force attacks by tracking requests per second.
+        Returns True if more than 5 requests within 1 second window.
+        """
+        now = time.time()
+        if ip not in self.brute_force_tracker:
+            self.brute_force_tracker[ip] = []
+        
+        # Keep only requests within the last 1 second
+        self.brute_force_tracker[ip] = [t for t in self.brute_force_tracker[ip] if now - t < 1.0]
+        self.brute_force_tracker[ip].append(now)
+        
+        # More than 5 requests per second = brute force
+        if len(self.brute_force_tracker[ip]) > 5:
+            return True
+        return False
+
     def analyze_request(self, raw_payload, ip_address):
         clean_payload = self.preprocess(raw_payload)
         
+        # 🚨 PRIORITY 1: Check for Brute Force Attack (>5 req/sec from same IP)
+        is_brute_force = self.detect_brute_force(ip_address)
+        if is_brute_force:
+            # Apply aggressive tarpit delay for brute force
+            delay = min(len(self.brute_force_tracker[ip_address]) * 2, 15)
+            time.sleep(delay)
+            
+            return {
+                "status": 429,  # Too Many Requests
+                "msg": "Too many login attempts. Please try again later.",
+                "classification": "Brute Force",
+                "confidence": 1.0,
+                "detection_source": "Rate Limiter (Brute Force Detection)",
+                "xai_explanation": None
+            }
+        
+        # PRIORITY 2: Heuristic pattern scanning for SQLi/XSS
         attack_type, confidence = self.reflex.scan(clean_payload)
         source = "Heuristic (Reflex)"
         explanation = None
         
+        # PRIORITY 3: ML Model classification if heuristics didn't catch anything
         if attack_type is None:
             if self.model:
                 pred_label = self.model.predict([clean_payload])[0]
@@ -102,6 +139,7 @@ class ChameleonDefense:
                 attack_type = "Benign"
                 confidence = 0.0
 
+        # Apply tarpit delay for SQLi/XSS attacks
         delay = 0
         if attack_type in ['SQLi', 'XSS']:
             delay = self.tarpit_logic(ip_address)

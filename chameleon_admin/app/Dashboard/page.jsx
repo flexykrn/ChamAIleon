@@ -19,6 +19,7 @@ import {
   Globe,
   X,
   ShieldAlert,
+  Lock,
 } from "lucide-react";
 import ChartRadarAttack from "./Components/RadarCharts";
 import ChartLineAttacks from "./Components/LineChart";
@@ -325,7 +326,7 @@ export default function Dashboard() {
       <main className="mt-8">
         {/* Insert dashboard content here */}
         <div className="max-w-7xl  mx-auto">
-          <div id="kpi-cards-section" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div id="kpi-cards-section" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             <KPICard
               title="Total Threats"
               value={stats.total}
@@ -346,13 +347,19 @@ export default function Dashboard() {
               value={stats.sqli}
               icon={ShieldAlert}
             />
+            <KPICard
+              title="Brute Force"
+              value={stats.bruteforce}
+              icon={Lock}
+            />
           </div>
           <div id="charts-row" className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <ChartRadarAttack
               dataCounts={{ 
                 benign: stats.benign, 
                 xss: stats.xss, 
-                sqli: stats.sqli
+                sqli: stats.sqli,
+                bruteforce: stats.bruteforce
               }}
               title="Attack Distribution"
             />
@@ -377,6 +384,7 @@ export default function Dashboard() {
                     radius: 500,
                     color: attack.classification === 'sqli' ? 'rgba(239,68,68,0.7)' : 
                            attack.classification === 'xss' ? 'rgba(251,146,60,0.7)' : 
+                           attack.classification === 'brute force' || attack.classification === 'bruteforce' ? 'rgba(168,85,247,0.7)' :
                            'rgba(240,196,25,0.7)',
                     popup: `${attack.city || 'Unknown'}, ${attack.country || 'Unknown'}`
                   }))
