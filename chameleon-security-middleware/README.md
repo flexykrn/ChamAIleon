@@ -1,78 +1,251 @@
-# Chameleon Middleware
+# Chameleon Middleware# Chameleon Middleware# Chameleon Middleware
 
-AI-powered middleware for Express.js that detects SQL injection and XSS attacks using machine learning, with automated setup wizard and intelligent response handling.
 
-## Features
 
-- **ML-Powered Attack Detection**: 95%+ accuracy in detecting SQLi and XSS attacks
-- **Automated Setup Wizard**: Interactive CLI generates complete server setup in minutes
-- **Intelligent Response Pages**: Different responses for different request patterns
-- **Smart Data Switching**: Adaptive data handling based on request analysis
-- **Session Tracking**: Monitors request patterns across sessions
-- **Adaptive Response**: Increases security measures for suspicious activity
-- **Request Delays**: Rate limiting for suspicious patterns
-- **XAI Explanations**: See why requests were flagged
-- **Optional Firebase Logging**: Store activity for forensics
+AI-powered middleware for Express.js and Next.js applications with ML-based attack detection.
 
-## Installation
+
+
+## InstallationMiddleware for Express and Next.js applications with ML-powered request analysis.AI-powered middleware for Express.js that detects SQL injection and XSS attacks using machine learning, with automated setup wizard and intelligent response handling.
+
+
 
 ```bash
+
+# Via GitHub (latest version)
+
+npm install github:flexykrn/ChamAIleon#master:chameleon-security-middleware## Installation## Features
+
+
+
+# Or via NPM
+
 npm install chameleon-middleware
-```
 
-## Quick Start
+``````bash- **ML-Powered Attack Detection**: 95%+ accuracy in detecting SQLi and XSS attacks
 
-### 1. Run the Setup Wizard
 
-```bash
+
+## Quick Startnpm install chameleon-middleware- **Automated Setup Wizard**: Interactive CLI generates complete server setup in minutes
+
+
+
+### Interactive Setup Wizard```- **Intelligent Response Pages**: Different responses for different request patterns
+
+
+
+```bash- **Smart Data Switching**: Adaptive data handling based on request analysis
+
 npx chameleon-init
-```
 
-The wizard will ask you:
-- ML API URL (default provided)
-- Number of endpoints to protect
-- Alternative data values for each endpoint
-- Firebase logging configuration (optional)
+```## Quick Start- **Session Tracking**: Monitors request patterns across sessions
 
-### 2. Generated Files
 
-The wizard automatically creates:
 
-- `server.js` - Complete Express server with ML protection
-- `trap-data.json` - Alternative data schemas
-- `data-switcher-config.js` - Smart data generator
-- `trap-page.html` - Professional login page
-- `dashboard.html` - User dashboard
-- `trap.html` - Alternative page
-- `README.md` - Documentation
-- `package.json` - Updated with scripts
+This launches an interactive wizard that generates a complete server setup with ML-powered request analysis.- **Adaptive Response**: Increases security measures for suspicious activity
 
-### 3. Start the Server
 
-```bash
+
+### Manual Setup```javascript- **Request Delays**: Rate limiting for suspicious patterns
+
+
+
+```javascriptimport express from 'express';- **XAI Explanations**: See why requests were flagged
+
+import express from 'express';
+
+import { ChameleonDefense } from 'chameleon-middleware';import { ChameleonDefense } from 'chameleon-middleware';- **Optional Firebase Logging**: Store activity for forensics
+
+
+
+const app = express();
+
+
+
+const defense = new ChameleonDefense({const app = express();## Installation
+
+  mlApiUrl: 'https://chameleon-defence-api.onrender.com/analyze',
+
+  confidenceThreshold: 0.7,
+
+  responseMode: 'adaptive',
+
+  enableSessionTracking: trueconst defense = new ChameleonDefense({```bash
+
+});
+
+  mlApiUrl: 'https://chameleon-defence-api.onrender.com/analyze',npm install chameleon-middleware
+
+app.use(defense.middleware());
+
+  confidenceThreshold: 0.7```
+
+app.listen(3000, () => {
+
+  console.log('Server running with Chameleon protection');});
+
+});
+
+```## Quick Start
+
+
+
+## Featuresapp.use(defense.middleware());
+
+
+
+- **ML-Powered Detection**: 95%+ accuracy in detecting SQL injection and XSS attacks### 1. Run the Setup Wizard
+
+- **Automated Setup**: Interactive CLI generates complete server configuration
+
+- **Adaptive Response**: Intelligent handling based on threat levelapp.listen(3000);
+
+- **Session Tracking**: Monitor request patterns across sessions
+
+- **XAI Explanations**: Understand why requests were flagged``````bash
+
+- **Firebase Integration**: Optional logging for forensic analysis
+
+npx chameleon-init
+
+## Configuration Options
+
+## Features```
+
+```javascript
+
+const defense = new ChameleonDefense({
+
+  // ML API endpoint
+
+  mlApiUrl: 'https://chameleon-defence-api.onrender.com/analyze',- ML-powered request analysisThe wizard will ask you:
+
+  
+
+  // Minimum confidence threshold (0-1)- Adaptive response generation- ML API URL (default provided)
+
+  confidenceThreshold: 0.7,
+
+  - Session tracking- Number of endpoints to protect
+
+  // Response mode: 'adaptive' | 'static' | 'custom'
+
+  responseMode: 'adaptive',- Configurable confidence thresholds- Alternative data values for each endpoint
+
+  
+
+  // Enable session-based tracking- Firebase logging configuration (optional)
+
+  enableSessionTracking: true,
+
+  ## Configuration
+
+  // Firebase configuration (optional)
+
+  firebase: {### 2. Generated Files
+
+    apiKey: 'your-api-key',
+
+    projectId: 'your-project-id'```javascript
+
+  },
+
+  const defense = new ChameleonDefense({The wizard automatically creates:
+
+  // Custom response handling
+
+  customResponses: {  mlApiUrl: 'https://chameleon-defence-api.onrender.com/analyze',
+
+    suspicious: (req, res, analysis) => {
+
+      // Your custom response logic  confidenceThreshold: 0.7,- `server.js` - Complete Express server with ML protection
+
+    }
+
+  }  responseMode: 'adaptive',- `trap-data.json` - Alternative data schemas
+
+});
+
+```  enableSessionTracking: true- `data-switcher-config.js` - Smart data generator
+
+
+
+## Architecture});- `trap-page.html` - Professional login page
+
+
+
+``````- `dashboard.html` - User dashboard
+
+Request → ML Analysis → Classification → Response
+
+              ↓- `trap.html` - Alternative page
+
+         Session Tracking
+
+              ↓## License- `README.md` - Documentation
+
+       Firebase Logging (optional)
+
+```- `package.json` - Updated with scripts
+
+
+
+## APIMIT
+
+
+
+### ChameleonDefense### 3. Start the Server
+
+
+
+Main class for middleware functionality.```bash
+
 npm start
-```
 
-Visit `http://localhost:5000` to see your protected login page.
+#### Methods```
 
-## How It Works
 
-```
+
+- `middleware()` - Returns Express middleware functionVisit `http://localhost:5000` to see your protected login page.
+
+- `analyze(payload, ipAddress)` - Manually analyze a payload
+
+- `getSessionData(sessionId)` - Retrieve session information## How It Works
+
+
+
+## Examples```
+
 User Request → ML Analysis → Classification
-    ↓
+
+See the [examples](./examples/) directory for complete working examples:    ↓
+
 Attack Detected?
-  YES → Redirect to /trap (test data)
+
+- `basic-server.js` - Simple Express server with Chameleon protection  YES → Redirect to /trap (test data)
+
   NO  → Redirect to /dashboard (real data)
-    ↓
+
+## License    ↓
+
 Same UI, Different Data
-```
 
-### For Normal Users
+MIT```
 
-```bash
-Username: admin
-Password: admin123
-```
+
+
+## Links### For Normal Users
+
+
+
+- [GitHub Repository](https://github.com/flexykrn/ChamAIleon)```bash
+
+- [ML Backend API](https://chameleon-defence-api.onrender.com)Username: admin
+
+- [Main Application](https://cham-a-ileon.vercel.app)Password: admin123
+
+- [Admin Dashboard](https://cham-a-ileon-i9cw.vercel.app)```
+
 
 - ML classifies as "Benign"
 - User goes to `/dashboard`

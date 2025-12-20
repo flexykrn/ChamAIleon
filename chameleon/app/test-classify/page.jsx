@@ -52,7 +52,7 @@ export default function TestClassifyPage() {
             🧪 Classifier API Test Page
           </h1>
           <p className="text-gray-400">
-            Test the ML classifier API endpoint: <code className="text-blue-400">https://chameleon-api-umen.onrender.com/analyze</code>
+            Test the ML classifier API endpoint: <code className="text-blue-400">https://chameleon-defence-api.onrender.com/analyze</code>
           </p>
         </div>
 

@@ -23,7 +23,30 @@
 |------------|-----|-------------|
 | 🏦 **Main Application** | https://cham-a-ileon.vercel.app | User-facing honeypot banking interface |
 | 🛡️ **Admin Dashboard** | https://cham-a-ileon-i9cw.vercel.app | Real-time security monitoring & forensics |
-| 🤖 **ML Backend API** | [chameleon-api-umen.onrender.com](https://chameleon-api-umen.onrender.com) | Machine learning classification engine |
+| 🤖 **ML Backend API** | [chameleon-defence-api.onrender.com](https://chameleon-defence-api.onrender.com) | Machine learning classification engine |
+| 📦 **NPM Middleware** | [chameleon-middleware](https://www.npmjs.com/package/chameleon-middleware) | Security middleware package (v1.1.0) |
+
+---
+
+## 📦 Installation (Middleware)
+
+Install the Chameleon security middleware for your Express or Next.js application:
+
+```bash
+# Via GitHub (recommended for latest features)
+npm install github:flexykrn/ChamAIleon#master:chameleon-security-middleware
+
+# Or via NPM (if published)
+npm install chameleon-middleware
+```
+
+### Quick Setup
+
+```bash
+npx chameleon-init
+```
+
+This launches an interactive wizard that generates a complete server setup with ML-powered request analysis.
 
 
 

@@ -21,7 +21,7 @@ export async function POST(request) {
     console.log('Sending to Render API:', { payload: input, ip_address: ip });
 
     // Call deployed Render API with correct format
-    const response = await fetch('https://chameleon-api-umen.onrender.com/analyze', {
+    const response = await fetch('https://chameleon-defence-api.onrender.com/analyze', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
