@@ -6,7 +6,7 @@
 
 export class MLConnector {
   constructor(config = {}) {
-    this.apiUrl = config.mlApiUrl || 'https://chameleon-api-umen.onrender.com/analyze';
+    this.apiUrl = config.mlApiUrl || 'https://chameleon-defence-api.onrender.com/analyze';
     this.confidenceThreshold = config.confidenceThreshold || 0.7;
     this.timeout = config.timeout || 10000;
     this.retries = config.retries || 2;

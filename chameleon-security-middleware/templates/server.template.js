@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Initialize Chameleon Defense
 const defense = new ChameleonDefense({
-  mlApiUrl: 'https://chameleon-api-umen.onrender.com/analyze',
+  mlApiUrl: 'https://chameleon-defence-api.onrender.com/analyze',
   confidenceThreshold: 0.7,
   responseMode: 'adaptive',
   enableSessionTracking: true,
@@ -60,7 +60,7 @@ app.post('/api/login', async (req, res) => {
   // Step 2: Analyze username and password separately for attacks
   try {
     // Analyze username first
-    const usernameResponse = await fetch('https://chameleon-api-umen.onrender.com/analyze', {
+    const usernameResponse = await fetch('https://chameleon-defence-api.onrender.com/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ payload: username })
@@ -71,7 +71,7 @@ app.post('/api/login', async (req, res) => {
     const usernameConfidence = usernameData.analysis?.confidence || 0;
     
     // Analyze password
-    const passwordResponse = await fetch('https://chameleon-api-umen.onrender.com/analyze', {
+    const passwordResponse = await fetch('https://chameleon-defence-api.onrender.com/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ payload: password })

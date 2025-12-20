@@ -11,7 +11,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Initialize Chameleon Defense
 const defense = new ChameleonDefense({
-  mlApiUrl: 'https://chameleon-api-umen.onrender.com/analyze',
+  mlApiUrl: 'https://chameleon-defence-api.onrender.com/analyze',
   confidenceThreshold: 0.7,
   responseMode: 'adaptive',
   delayEnabled: true

@@ -42,7 +42,7 @@ async function setupChameleon() {
   console.log('\n📡 Step 1: ML API Configuration');
   console.log('─'.repeat(60));
   const mlApiUrl = await question('Enter ML API URL (press Enter for default): ') || 
-                  'https://chameleon-api-umen.onrender.com/analyze';
+                  'https://chameleon-defence-api.onrender.com/analyze';
   console.log('✓ Using:', mlApiUrl);
 
   // Step 2: Trap Data

@@ -1,6 +1,6 @@
 {
   "name": "chameleon-middleware",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Advanced middleware with ML-powered request analysis, adaptive response generation, and intelligent traffic routing for Express and Next.js applications",
   "main": "src/index.js",
   "type": "module",

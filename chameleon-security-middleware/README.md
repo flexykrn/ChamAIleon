@@ -106,7 +106,7 @@ const app = express();
 
 // Initialize ML-powered protection
 const defense = new ChameleonDefense({
-  mlApiUrl: 'https://chameleon-api-umen.onrender.com/analyze',
+  mlApiUrl: 'https://chameleon-defence-api.onrender.com/analyze',
   confidenceThreshold: 0.7,
   enableSessionTracking: true
 });
