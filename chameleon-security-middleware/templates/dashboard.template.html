@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+        
+        .card-title {
+            font-size: 14px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+        
+        .card-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .card-change {
+            font-size: 13px;
+            color: #10b981;
+        }
+        
+        .card-change.negative {
+            color: #ef4444;
+        }
+        
+        .success-banner {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .success-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .chameleon-status {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .chameleon-status h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .status-item:last-child {
+            border-bottom: none;
+        }
+        
+        .status-label {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .status-value {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🦎 Admin Dashboard</h1>
+        <p>Welcome back! Your system is protected by Chameleon Security.</p>
+    </div>
+    
+    <div class="container">
+        <div class="success-banner">
+            <div class="success-icon">✓</div>
+            <div>
+                <h3 style="margin-bottom: 5px;">Login Successful!</h3>
+                <p style="opacity: 0.9;">You've been authenticated by Chameleon ML-powered security.</p>
+            </div>
+        </div>
+        
+        <div class="cards">
+            <div class="card">
+                <div class="card-title">Total Requests</div>
+                <div class="card-value" id="totalRequests">0</div>
+                <div class="card-change">Loading...</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">Attacks Blocked</div>
+                <div class="card-value" id="attacksBlocked">0</div>
+                <div class="card-change" id="attackChange">Loading...</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">Clean Requests</div>
+                <div class="card-value" id="cleanRequests">0</div>
+                <div class="card-change">✓ Verified by ML</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">Protection Level</div>
+                <div class="card-value">🛡️</div>
+                <div class="card-change">Maximum</div>
+            </div>
+        </div>
+        
+        <div class="chameleon-status">
+            <h2>Chameleon Security Status</h2>
+            
+            <div class="status-item">
+                <span class="status-label">ML Detection Engine</span>
+                <span class="status-value"><span class="badge badge-success">Active</span></span>
+            </div>
+            
+            <div class="status-item">
+                <span class="status-label">Adaptive Response</span>
+                <span class="status-value"><span class="badge badge-success">Enabled</span></span>
+            </div>
+            
+            <div class="status-item">
+                <span class="status-label">Session Tracking</span>
+                <span class="status-value"><span class="badge badge-success">Active</span></span>
+            </div>
+            
+            <div class="status-item">
+                <span class="status-label">Confidence Threshold</span>
+                <span class="status-value">70%</span>
+            </div>
+            
+            <div class="status-item">
+                <span class="status-label">Last Attack Detected</span>
+                <span class="status-value" id="lastAttack">Never</span>
+            </div>
+            
+            <div class="status-item">
+                <span class="status-label">ML API Status</span>
+                <span class="status-value" id="mlApiStatus"><span class="badge badge-warning">Checking...</span></span>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Fetch real-time statistics from Chameleon
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/chameleon/stats');
+                const data = await response.json();
+                
+                console.log('Chameleon Stats:', data);
+                
+                // Update dashboard with real data
+                if (data.requests) {
+                    document.getElementById('totalRequests').textContent = data.requests.total || 0;
+                    document.getElementById('attacksBlocked').textContent = data.requests.suspicious || 0;
+                    document.getElementById('cleanRequests').textContent = data.requests.benign || 0;
+                    
+                    if (data.requests.suspicious > 0) {
+                        document.getElementById('attackChange').textContent = `⚠️ ${data.requests.suspicious} threats blocked`;
+                        document.getElementById('attackChange').classList.add('negative');
+                    }
+                    
+                    if (data.requests.lastAttack) {
+                        document.getElementById('lastAttack').textContent = new Date(data.requests.lastAttack).toLocaleString();
+                    }
+                }
+                
+                // Check ML API status
+                document.getElementById('mlApiStatus').innerHTML = '<span class="badge badge-success">Connected</span>';
+                
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+                document.getElementById('mlApiStatus').innerHTML = '<span class="badge badge-warning">Error</span>';
+            }
+        }
+        
+        // Load stats on page load
+        loadStats();
+        
+        // Refresh stats every 5 seconds
+        setInterval(loadStats, 5000);
+    </script>
+</body>
+</html>

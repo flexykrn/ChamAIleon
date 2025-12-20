@@ -1,0 +1,48 @@
+{
+  "name": "chameleon-middleware",
+  "version": "1.0.1",
+  "description": "Advanced middleware with ML-powered request analysis, adaptive response generation, and intelligent traffic routing for Express and Next.js applications",
+  "main": "src/index.js",
+  "type": "module",
+  "files": [
+    "bin/",
+    "src/",
+    "templates/",
+    "examples/",
+    "README.md",
+    "LICENSE"
+  ],
+  "bin": {
+    "chameleon-init": "./bin/setup.js",
+    "chameleon-setup": "./bin/setup.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "chameleon",
+    "middleware",
+    "ml-detection",
+    "adaptive",
+    "express",
+    "nextjs",
+    "request-analysis"
+  ],
+  "author": "Chameleon Security Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/flexykrn/Chameleon_The_Outliers_SPIT_REDACT.git"
+  },
+  "bugs": {
+    "url": "https://github.com/flexykrn/Chameleon_The_Outliers_SPIT_REDACT/issues"
+  },
+  "homepage": "https://github.com/flexykrn/Chameleon_The_Outliers_SPIT_REDACT#readme",
+  "dependencies": {
+    "express": "^4.21.2",
+    "node-fetch": "^3.3.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
