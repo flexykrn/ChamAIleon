@@ -3,6 +3,7 @@
 .env.local
 .env*.local
 *.env
+.envrc
 
 # Node modules
 node_modules/

@@ -10,7 +10,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 dotenv.config();
-
+//merkle hashing
 class MerkleTree {
     constructor(leaves) {
         this.leaves = leaves.map(l => this.hashLeaf(l));
