@@ -131,8 +131,7 @@ User Input → Main App → ML Backend → Classification
 ### **1. Clone Repository**
 
 ```bash
-git clone https://github.com/flexykrn/Chameleon_The_Outliers_SPIT_REDACT.git
-cd Chameleon_The_Outliers_SPIT_REDACT
+git clone https://github.com/flexykrn/ChamAIleon
 ```
 
 ### **2. Setup Main Application**
